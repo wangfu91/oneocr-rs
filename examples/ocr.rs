@@ -16,11 +16,28 @@ fn main() -> Result<(), OneOcrError> {
     let image_path = Path::new("./target/snapshot_01.PNG");
 
     // Perform OCR on an image
-    // Set word_level_detail to false to get the result quickly.
-    let ocr_result = ocr_engine.run(image_path, false)?;
+    // Set word_level_detail to false to get the result back faster.
+    let include_word_level_detail = true;
+    let ocr_result = ocr_engine.run(image_path, include_word_level_detail)?;
 
-    // Print the result
-    println!("{:#?}", ocr_result.lines);
+    for line in &ocr_result.lines {
+        println!("\n");
+        println!("Line: {}", line.content);
+        println!("{:?}", line.bounding_box);
+
+        let (handwriting, confidence) = line.get_line_style()?;
+        println!(
+            "Style: handwrting: {}, confidence: {}",
+            handwriting, confidence
+        );
+
+        if let Some(words) = &line.words {
+            for word in words {
+                print!("Word: [{}, {}]\t", word.content, word.confidence);
+                //println!("{:?}", word.bounding_box);
+            }
+        }
+    }
 
     Ok(())
 }
