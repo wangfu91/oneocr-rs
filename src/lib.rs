@@ -35,6 +35,7 @@ type GetOcrLineCount = unsafe extern "C" fn(i64, *mut i64) -> i64;
 type GetOcrLine = unsafe extern "C" fn(i64, i64, *mut i64) -> i64;
 type GetOcrLineContent = unsafe extern "C" fn(i64, *mut i64) -> i64;
 type GetOcrLineBoundingBox = unsafe extern "C" fn(i64, *mut *const BoundingBox) -> i64;
+type GetOcrLineStyle = unsafe extern "C" fn(i64, *mut i32, *mut f32) -> i64;
 
 type GetOcrLineWordCount = unsafe extern "C" fn(i64, *mut i64) -> i64;
 type GetOcrWord = unsafe extern "C" fn(i64, i64, *mut i64) -> i64;
@@ -350,7 +351,7 @@ impl Drop for OcrEngine {
 pub struct OcrResult<'a> {
     lib: &'a Library,
     result_handle: i64,
-    pub lines: Vec<OcrLine>,
+    pub lines: Vec<OcrLine<'a>>,
     pub image_angle: f32,
 }
 
@@ -401,15 +402,17 @@ impl Drop for OcrResult<'_> {
 }
 
 #[derive(Debug)]
-pub struct OcrLine {
+pub struct OcrLine<'a> {
+    lib: &'a Library,
+    line_handle: i64,
     pub content: String,
     pub bounding_box: BoundingBox,
     pub words: Option<Vec<OcrWord>>,
 }
 
-impl OcrLine {
+impl<'a> OcrLine<'a> {
     pub fn new(
-        lib: &Library,
+        lib: &'a Library,
         line_handle: i64,
         word_level_detail: bool,
     ) -> Result<Self, OneOcrError> {
@@ -442,6 +445,8 @@ impl OcrLine {
 
         if !word_level_detail {
             return Ok(Self {
+                lib,
+                line_handle,
                 content: line_content_str,
                 bounding_box,
                 words: None,
@@ -467,10 +472,42 @@ impl OcrLine {
         }
 
         Ok(Self {
+            lib,
+            line_handle,
             content: line_content_str,
             bounding_box,
             words: Some(words),
         })
+    }
+
+    /// Get the line style and confidence score.
+    ///  - Returns a tuple containing:
+    ///    - A boolean indicating if the line is handwritten (true) or printed (false).
+    ///    - A confidence score (0.0-1.0) indicating the certainty of the classification.
+    ///      - 0.0: Printed text
+    ///      - 1.0: Handwriting
+    ///  - Returns an error if the OCR API call fails.
+    pub fn get_line_style(&self) -> Result<(bool, f32), OneOcrError> {
+        load_symbol!(self.lib, get_ocr_line_style_fn, GetOcrLineStyle);
+
+        // It could only be 0 or 1.
+        // 0: Handwriting
+        // 1: Printed text
+        let mut handwriting: i32 = 0;
+        // Confidence score of the handwriting classification.
+        // Range is 0.0-1.0.
+        // 0.0: Printed text
+        // 1.0: Handwriting
+        let mut confidence_score: f32 = 0.0;
+
+        check_ocr_call!(
+            unsafe {
+                get_ocr_line_style_fn(self.line_handle, &mut handwriting, &mut confidence_score)
+            },
+            "Failed to get OCR line style"
+        );
+
+        Ok((handwriting == 0, confidence_score))
     }
 }
 
