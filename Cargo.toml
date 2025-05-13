@@ -1,0 +1,9 @@
+[package]
+name = "oneocr-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+image = "0.25.6"
+libloading = "0.8"
+thiserror = "2.0.12"
