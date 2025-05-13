@@ -1,3 +1,6 @@
+pub mod errors;
+
+use errors::OneOcrError;
 use image::DynamicImage;
 use libloading::Library;
 use std::{
@@ -69,13 +72,9 @@ macro_rules! release_ocr_resource {
             Ok(func_symbol) => {
                 unsafe { func_symbol($($arg),*) };
             }
-            Err(e) => {
-                // In a real application, you might use a more sophisticated logger.
-                eprintln!(
-                    "Warning: Failed to load symbol '{}' during drop, call skipped: {:?}",
-                    stringify!($symbol_name_type),
-                    e
-                );
+            Err(_) => {
+                // Ignore the error, as this is best effort
+                // and we are in the drop context.
             }
         }
     };
@@ -170,9 +169,16 @@ impl OcrEngine {
         );
 
         let model_path = Self::get_model_path()?;
-        let model_path_cstr = std::ffi::CString::new(model_path.clone())?;
+        let model_path_cstr = std::ffi::CString::new(model_path).map_err(|e| {
+            OneOcrError::ModelFileLoadError(format!(
+                "Failed to convert model path to CString: {}",
+                e
+            ))
+        })?;
 
-        let key_cstr = std::ffi::CString::new(ONE_OCR_MODEL_KEY)?;
+        let key_cstr = std::ffi::CString::new(ONE_OCR_MODEL_KEY).map_err(|e| {
+            OneOcrError::InvalidModelKey(format!("Failed to convert model key to CString: {}", e))
+        })?;
 
         let mut pipeline: i64 = 0;
         check_ocr_call!(
@@ -510,32 +516,4 @@ impl OcrWord {
             bounding_box,
         })
     }
-}
-
-// Define a custom error type named OneOcrError using thiserror crate for better error handling
-#[derive(Debug, thiserror::Error)]
-pub enum OneOcrError {
-    #[error("Failed to open image: {0}")]
-    ImageOpenError(#[from] image::ImageError),
-
-    #[error("Image format not supported: {0}")]
-    ImageFormatError(String),
-
-    #[error("Failed to load library: {0}")]
-    LibraryLoadError(#[from] libloading::Error),
-
-    #[error("Failed to load model file: {0}")]
-    ModelFileLoadError(String),
-
-    #[error("Invalid model decryption key: {0}")]
-    InvalidModelKey(String),
-
-    #[error("CString contains null byte: {0}")]
-    CStringNulError(#[from] std::ffi::NulError),
-
-    #[error("Failed to run ocr API {result}, result: {message}")]
-    OcrApiError { result: i64, message: String },
-
-    #[error("Other error: {0}")]
-    Other(String),
 }
