@@ -26,6 +26,7 @@ type OcrProcessOptionsSetMaxRecognitionLineCount = unsafe extern "C" fn(i64, i64
 type OcrProcessOptionsGetResizeResolution = unsafe extern "C" fn(i64, *mut i64, *mut i64) -> i64;
 type OcrProcessOptionsSetResizeResolution = unsafe extern "C" fn(i64, i64, i64) -> i64;
 
+/// Image resolution must be great than 50*50, otherwise it will return error code 3.
 type RunOcrPipeline = unsafe extern "C" fn(i64, *const Image, i64, *mut i64) -> i64;
 
 type GetImageAngle = unsafe extern "C" fn(i64, *mut f32) -> i64;
@@ -274,6 +275,10 @@ impl OcrEngine {
         Ok(())
     }
 
+    /// Run the OCR pipeline on the given image path.
+    ///  - `image_path`: The path to the image file.
+    ///  - `word_level_detail`: If true, returns word-level recognition details.
+    ///  - Returns an `OcrResult` containing the recognized text and bounding boxes.
     pub fn run(
         &self,
         image_path: &Path,
