@@ -340,7 +340,7 @@ pub struct OcrResult<'a> {
     lib: &'a Library,
     result_handle: i64,
     pub lines: Vec<OcrLine>,
-    pub angle: f32,
+    pub image_angle: f32,
 }
 
 impl<'a> OcrResult<'a> {
@@ -378,7 +378,7 @@ impl<'a> OcrResult<'a> {
             lib,
             result_handle,
             lines,
-            angle,
+            image_angle: angle,
         })
     }
 }
