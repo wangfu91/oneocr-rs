@@ -27,6 +27,7 @@ type OcrProcessOptionsGetResizeResolution = unsafe extern "C" fn(i64, *mut i64, 
 type OcrProcessOptionsSetResizeResolution = unsafe extern "C" fn(i64, i64, i64) -> i64;
 
 /// Image resolution must be great than 50*50, otherwise it will return error code 3.
+/// For images with a resolution less than 50*50, you should manually scale up the image first.
 type RunOcrPipeline = unsafe extern "C" fn(i64, *const Image, i64, *mut i64) -> i64;
 
 type GetImageAngle = unsafe extern "C" fn(i64, *mut f32) -> i64;
@@ -138,6 +139,7 @@ pub struct BoundingBox {
     y4: f32,
 }
 
+/// The `OcrEngine` struct represents the OneOcr processing engine.
 #[derive(Debug)]
 pub struct OcrEngine {
     lib: Library,
@@ -147,6 +149,8 @@ pub struct OcrEngine {
 }
 
 impl OcrEngine {
+    /// Creates a new instance of the OCR engine.
+    /// This function loads the necessary library and initializes the OCR pipeline.    
     pub fn new() -> Result<Self, OneOcrError> {
         let lib = unsafe { Library::new("oneocr.dll")? };
 
@@ -209,6 +213,11 @@ impl OcrEngine {
         })
     }
 
+    /// Retrieves the maximum number of lines that can be recognized.
+    /// This function returns the current maximum number of lines that the OCR engine will process.
+    /// The default value is 100, and the range is from 0 to 1000.
+    ///  - Returns the maximum number of lines that can be recognized.
+    /// - Returns an error if the OCR API call fails.
     pub fn get_max_recognition_line_count(&self) -> Result<i64, OneOcrError> {
         load_symbol!(
             self.lib,
@@ -225,7 +234,12 @@ impl OcrEngine {
         Ok(count)
     }
 
-    pub fn set_max_recognition_line_count(&mut self, count: i64) -> Result<(), OneOcrError> {
+    /// Sets the maximum number of lines that can be recognized.
+    /// This function allows you to limit the number of lines that the OCR engine will process.
+    /// The default value is 100, and the range is from 0 to 1000.
+    ///  - `count`: The maximum number of lines to recognize.
+    ///  - Returns an error if the OCR API call fails.
+    pub fn set_max_recognition_line_count(&self, count: i64) -> Result<(), OneOcrError> {
         load_symbol!(
             self.lib,
             ocr_process_options_set_max_recognition_line_count,
@@ -240,6 +254,15 @@ impl OcrEngine {
         Ok(())
     }
 
+    /// Retrieves the maximum internal resize resolution.
+    /// This function returns the current maximum resize resolution that the OCR engine uses
+    /// when downscaling input images prior to text recognition.
+    ///
+    /// The internal resizing operation ensures that high-resolution images are scaled down
+    /// to a standard size (by default 1152x768) to balance processing speed and recognition accuracy.
+    ///
+    /// - Returns a tuple containing the width and height of the maximum resize resolution.
+    /// - Returns an error if the OCR API call fails.
     pub fn get_resize_resolution(&self) -> Result<(i64, i64), OneOcrError> {
         load_symbol!(
             self.lib,
@@ -261,7 +284,19 @@ impl OcrEngine {
         Ok((width, height))
     }
 
-    pub fn set_resize_resolution(&mut self, width: i64, height: i64) -> Result<(), OneOcrError> {
+    /// Sets the maximum internal resize resolution.
+    ///     
+    /// Rather than restricting the input image size, this limit controls the resolution to which images
+    /// are rescaled internally before being processed by the OCR engine.
+    ///
+    /// The resoultion cannot exceed the maximum allowed values, which are 1152x768.
+    ///
+    /// Setting a resolution lower than the default (1152x768) may improve processing speed?
+    ///
+    ///  - `width`: The maximum width for the resized image.
+    ///  - `height`: The maximum height for the resized image.
+    ///  - Returns an error if the width or height exceeds the maximum allowed values.
+    pub fn set_resize_resolution(&self, width: i64, height: i64) -> Result<(), OneOcrError> {
         load_symbol!(
             self.lib,
             ocr_process_options_set_resize_resolution,
@@ -321,6 +356,8 @@ impl OcrEngine {
         OcrResult::new(&self.lib, ocr_result, word_level_detail)
     }
 
+    /// Retrieves the path to the model file.
+    /// This function constructs the path to the model file based on the current executable's directory.    
     fn get_model_path() -> Result<String, OneOcrError> {
         let exe_path = std::env::current_exe().map_err(|e| {
             OneOcrError::ModelFileLoadError(format!("Failed to get current executable path: {}", e))
@@ -347,6 +384,8 @@ impl Drop for OcrEngine {
     }
 }
 
+/// The `OcrResult` struct represents the result of an OCR operation.
+/// It contains the recognized text lines, their bounding boxes, and the image angle.
 #[derive(Debug)]
 pub struct OcrResult<'a> {
     lib: &'a Library,
@@ -401,11 +440,13 @@ impl Drop for OcrResult<'_> {
     }
 }
 
+/// The `OcrLine` struct represents a line of text recognized by the OCR engine.
+/// It contains the recognized text, its bounding box, and optionally the words within the line.
 #[derive(Debug)]
 pub struct OcrLine<'a> {
     lib: &'a Library,
     line_handle: i64,
-    pub content: String,
+    pub text: String,
     pub bounding_box: BoundingBox,
     pub words: Option<Vec<OcrWord>>,
 }
@@ -447,7 +488,7 @@ impl<'a> OcrLine<'a> {
             return Ok(Self {
                 lib,
                 line_handle,
-                content: line_content_str,
+                text: line_content_str,
                 bounding_box,
                 words: None,
             });
@@ -474,7 +515,7 @@ impl<'a> OcrLine<'a> {
         Ok(Self {
             lib,
             line_handle,
-            content: line_content_str,
+            text: line_content_str,
             bounding_box,
             words: Some(words),
         })
@@ -491,35 +532,38 @@ impl<'a> OcrLine<'a> {
         load_symbol!(self.lib, get_ocr_line_style_fn, GetOcrLineStyle);
 
         // It could only be 0 or 1.
-        // 0: Handwriting
-        // 1: Printed text
-        let mut handwriting: i32 = 0;
+        // 0: handwritten
+        // 1: Printed
+        let mut handwritten: i32 = 0;
+
         // Confidence score of the handwriting classification.
         // Range is 0.0-1.0.
-        // 0.0: Printed text
-        // 1.0: Handwriting
+        // 0.0: Printed
+        // 1.0: handwritten
         let mut confidence_score: f32 = 0.0;
 
         check_ocr_call!(
             unsafe {
-                get_ocr_line_style_fn(self.line_handle, &mut handwriting, &mut confidence_score)
+                get_ocr_line_style_fn(self.line_handle, &mut handwritten, &mut confidence_score)
             },
             "Failed to get OCR line style"
         );
 
-        Ok((handwriting == 0, confidence_score))
+        Ok((handwritten == 0, confidence_score))
     }
 }
 
+/// The `OcrWord` struct represents a word recognized by the OCR engine.
+/// It contains the recognized word, its confidence score, and its bounding box.
 #[derive(Debug)]
 pub struct OcrWord {
-    pub content: String,
+    pub text: String,
     pub confidence: f32,
     pub bounding_box: BoundingBox,
 }
 
 impl OcrWord {
-    pub fn new(lib: &Library, word_handle: i64) -> Result<Self, OneOcrError> {
+    fn new(lib: &Library, word_handle: i64) -> Result<Self, OneOcrError> {
         load_symbol!(lib, get_ocr_word_content, GetOcrWordContent);
         load_symbol!(lib, get_ocr_word_bounding_box, GetOcrWordBoundingBox);
         load_symbol!(lib, get_ocr_word_confidence, GetOcrWordConfidence);
@@ -553,7 +597,7 @@ impl OcrWord {
         );
 
         Ok(Self {
-            content: word_content_str,
+            text: word_content_str,
             confidence,
             bounding_box,
         })
