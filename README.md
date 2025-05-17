@@ -33,8 +33,6 @@ oneocr-rs = "0.1.0" # Replace with the latest version
 
 ## 💡 Usage
 
-### Simple OCR
-
 ```rust
 use oneocr_rs::errors::OneOcrError;
 use std::path::Path;
