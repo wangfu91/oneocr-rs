@@ -45,5 +45,11 @@ fn main() -> Result<(), OneOcrError> {
         }
     }
 
+    /*
+    // Serialize the OCR result to JSON
+    let json_result = serde_json::to_string_pretty(&ocr_result).unwrap();
+    println!("Serialized OCR result: {}", json_result);
+    */
+
     Ok(())
 }

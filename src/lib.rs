@@ -3,6 +3,7 @@ pub mod errors;
 use errors::OneOcrError;
 use image::DynamicImage;
 use libloading::Library;
+use serde::Serialize;
 use std::{
     ffi::{CStr, c_char},
     path::Path,
@@ -127,7 +128,7 @@ struct Image {
 ///  - x3, y3: Coordinates of the third corner (often the bottom-right).
 ///  - x4, y4: Coordinates of the fourth corner (often the bottom-left).
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct BoundingBox {
     x1: f32,
     y1: f32,
@@ -386,9 +387,11 @@ impl Drop for OcrEngine {
 
 /// The `OcrResult` struct represents the result of an OCR operation.
 /// It contains the recognized text lines, their bounding boxes, and the image angle.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct OcrResult<'a> {
+    #[serde(skip_serializing)]
     lib: &'a Library,
+    #[serde(skip_serializing)]
     result_handle: i64,
     pub lines: Vec<OcrLine<'a>>,
     pub image_angle: f32,
@@ -442,9 +445,11 @@ impl Drop for OcrResult<'_> {
 
 /// The `OcrLine` struct represents a line of text recognized by the OCR engine.
 /// It contains the recognized text, its bounding box, and optionally the words within the line.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct OcrLine<'a> {
+    #[serde(skip_serializing)]
     lib: &'a Library,
+    #[serde(skip_serializing)]
     line_handle: i64,
     pub text: String,
     pub bounding_box: BoundingBox,
@@ -555,7 +560,7 @@ impl<'a> OcrLine<'a> {
 
 /// The `OcrWord` struct represents a word recognized by the OCR engine.
 /// It contains the recognized word, its confidence score, and its bounding box.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct OcrWord {
     pub text: String,
     pub confidence: f32,
