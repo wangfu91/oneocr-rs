@@ -1,7 +1,7 @@
 use std::{path::Path, time::Duration};
 
 use criterion::{Criterion, criterion_group, criterion_main};
-use oneocr_rs::errors::OneOcrError;
+use oneocr_rs::OneOcrError;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("ocr_bench_group");
