@@ -5,7 +5,7 @@ use serde::Serialize;
 use std::ffi::{CStr, c_char};
 
 // FFI types used by this module
-use crate::{GetOcrWordBoundingBox, GetOcrWordConfidence, GetOcrWordContent};
+use crate::ffi::{GetOcrWordBoundingBox, GetOcrWordConfidence, GetOcrWordContent};
 // Macros
 use crate::{check_ocr_call, load_symbol};
 

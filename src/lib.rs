@@ -1,17 +1,15 @@
 mod bounding_box;
 mod errors;
+mod ffi;
 mod image;
 mod ocr_engine;
 mod ocr_line;
 mod ocr_result;
 mod ocr_word;
 
-use std::ffi::c_char;
-
-// Re-export the public structs for easier access by users of your library
+// Re-export the public structs for easier access
 pub use bounding_box::BoundingBox;
 pub use errors::OneOcrError;
-pub(crate) use image::Image;
 pub use ocr_engine::OcrEngine;
 pub use ocr_line::OcrLine;
 pub use ocr_result::OcrResult;
@@ -19,46 +17,6 @@ pub use ocr_word::OcrWord;
 
 pub(crate) const ONE_OCR_MODEL_FILE_NAME: &str = "oneocr.onemodel";
 pub(crate) const ONE_OCR_MODEL_KEY: &str = r#"kj)TGtrK>f]b[Piow.gU+nC@s""""""4"#;
-
-pub(crate) type CreateOcrInitOptions = unsafe extern "C" fn(*mut i64) -> i64;
-pub(crate) type OcrInitOptionsSetUseModelDelayLoad = unsafe extern "C" fn(i64, c_char) -> i64;
-pub(crate) type CreateOcrPipeline = unsafe extern "C" fn(
-    model_path: *const c_char,
-    key: *const c_char,
-    ctx: i64,
-    pipeline: *mut i64,
-) -> i64;
-
-pub(crate) type CreateOcrProcessOptions = unsafe extern "C" fn(*mut i64) -> i64;
-pub(crate) type OcrProcessOptionsGetMaxRecognitionLineCount =
-    unsafe extern "C" fn(i64, *mut i64) -> i64;
-pub(crate) type OcrProcessOptionsSetMaxRecognitionLineCount = unsafe extern "C" fn(i64, i64) -> i64;
-pub(crate) type OcrProcessOptionsGetResizeResolution =
-    unsafe extern "C" fn(i64, *mut i64, *mut i64) -> i64;
-pub(crate) type OcrProcessOptionsSetResizeResolution = unsafe extern "C" fn(i64, i64, i64) -> i64;
-
-/// Image resolution must be great than 50*50, otherwise it will return error code 3.
-/// For images with a resolution less than 50*50, you should manually scale up the image first.
-pub(crate) type RunOcrPipeline = unsafe extern "C" fn(i64, *const Image, i64, *mut i64) -> i64;
-
-pub(crate) type GetImageAngle = unsafe extern "C" fn(i64, *mut f32) -> i64;
-
-pub(crate) type GetOcrLineCount = unsafe extern "C" fn(i64, *mut i64) -> i64;
-pub(crate) type GetOcrLine = unsafe extern "C" fn(i64, i64, *mut i64) -> i64;
-pub(crate) type GetOcrLineContent = unsafe extern "C" fn(i64, *mut i64) -> i64;
-pub(crate) type GetOcrLineBoundingBox = unsafe extern "C" fn(i64, *mut *const BoundingBox) -> i64;
-pub(crate) type GetOcrLineStyle = unsafe extern "C" fn(i64, *mut i32, *mut f32) -> i64;
-
-pub(crate) type GetOcrLineWordCount = unsafe extern "C" fn(i64, *mut i64) -> i64;
-pub(crate) type GetOcrWord = unsafe extern "C" fn(i64, i64, *mut i64) -> i64;
-pub(crate) type GetOcrWordContent = unsafe extern "C" fn(i64, *mut i64) -> i64;
-pub(crate) type GetOcrWordBoundingBox = unsafe extern "C" fn(i64, *mut *const BoundingBox) -> i64;
-pub(crate) type GetOcrWordConfidence = unsafe extern "C" fn(i64, *mut f32) -> i64;
-
-pub(crate) type ReleaseOcrResult = unsafe extern "C" fn(i64);
-pub(crate) type ReleaseOcrInitOptions = unsafe extern "C" fn(i64);
-pub(crate) type ReleaseOcrPipeline = unsafe extern "C" fn(i64);
-pub(crate) type ReleaseOcrProcessOptions = unsafe extern "C" fn(i64);
 
 /// A macro to load a symbol from the library.
 /// This macro takes three arguments:

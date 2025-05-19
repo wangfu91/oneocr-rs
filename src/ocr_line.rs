@@ -6,7 +6,7 @@ use serde::Serialize;
 use std::ffi::{CStr, c_char};
 
 // FFI types
-use crate::{
+use crate::ffi::{
     GetOcrLineBoundingBox, GetOcrLineContent, GetOcrLineStyle, GetOcrLineWordCount, GetOcrWord,
 };
 // Macros

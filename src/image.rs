@@ -10,11 +10,11 @@
 /// This is important for interoperability with C libraries and for ensuring that the data layout matches the expected format.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct Image {
-    pub(crate) t: i32,
-    pub(crate) col: i32,
-    pub(crate) row: i32,
-    pub(crate) _unk: i32,
-    pub(crate) step: i64,
-    pub(crate) data_ptr: i64,
+pub struct Image {
+    pub t: i32,
+    pub col: i32,
+    pub row: i32,
+    pub _unk: i32,
+    pub step: i64,
+    pub data_ptr: i64,
 }
