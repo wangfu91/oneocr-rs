@@ -1,9 +1,9 @@
-use oneocr_rs::errors::OneOcrError;
+use oneocr_rs::{OcrEngine, OneOcrError};
 use std::path::Path;
 
 fn main() -> Result<(), OneOcrError> {
     // Create a new OCR instance
-    let ocr_engine = oneocr_rs::OcrEngine::new()?;
+    let ocr_engine = OcrEngine::new()?;
 
     // Default max recognition line count is 100, range is 0-1000.
     let max_line_conunt = ocr_engine.get_max_recognition_line_count()?;
