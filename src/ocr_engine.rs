@@ -1,13 +1,14 @@
 use crate::errors::OneOcrError;
+use crate::image::Image;
 use crate::ocr_result::OcrResult;
-use crate::{Image, ONE_OCR_MODEL_FILE_NAME, ONE_OCR_MODEL_KEY};
+use crate::{ONE_OCR_MODEL_FILE_NAME, ONE_OCR_MODEL_KEY};
 use image::DynamicImage;
 use libloading::Library;
 use std::ffi::{CString, c_char};
 use std::path::Path;
 
 // FFI types
-use crate::{
+use crate::ffi::{
     CreateOcrInitOptions, CreateOcrPipeline, CreateOcrProcessOptions,
     OcrInitOptionsSetUseModelDelayLoad, OcrProcessOptionsGetMaxRecognitionLineCount,
     OcrProcessOptionsGetResizeResolution, OcrProcessOptionsSetMaxRecognitionLineCount,
@@ -95,6 +96,7 @@ impl OcrEngine {
     }
 
     /// Retrieves the maximum number of lines that can be recognized.
+    /// Default is 100.
     pub fn get_max_recognition_line_count(&self) -> Result<i64, OneOcrError> {
         load_symbol!(
             self.lib,
@@ -112,6 +114,7 @@ impl OcrEngine {
     }
 
     /// Sets the maximum number of lines that can be recognized.
+    /// Default is 100, range is 0-1000.
     pub fn set_max_recognition_line_count(&self, count: i64) -> Result<(), OneOcrError> {
         load_symbol!(
             self.lib,
@@ -128,6 +131,11 @@ impl OcrEngine {
     }
 
     /// Retrieves the maximum internal resize resolution.
+    ///
+    /// The `resize resolution` defines the maximum dimensions to which an image will be automatically scaled internally before OCR processing.
+    /// It’s a performance and accuracy trade-off rather than a restriction on the original image’s resolution.
+    ///
+    /// Default is 1152*768.
     pub fn get_resize_resolution(&self) -> Result<(i64, i64), OneOcrError> {
         load_symbol!(
             self.lib,
@@ -150,6 +158,11 @@ impl OcrEngine {
     }
 
     /// Sets the maximum internal resize resolution.
+    ///
+    /// The `resize resolution` defines the maximum dimensions to which an image will be automatically scaled internally before OCR processing.
+    /// It’s a performance and accuracy trade-off rather than a restriction on the original image’s resolution.
+    ///
+    /// The maximum resolution is 1152*768.
     pub fn set_resize_resolution(&self, width: i64, height: i64) -> Result<(), OneOcrError> {
         load_symbol!(
             self.lib,

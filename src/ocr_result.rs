@@ -4,7 +4,7 @@ use libloading::Library;
 use serde::Serialize;
 
 // FFI types
-use crate::{GetImageAngle, GetOcrLine, GetOcrLineCount, ReleaseOcrResult};
+use crate::ffi::{GetImageAngle, GetOcrLine, GetOcrLineCount, ReleaseOcrResult};
 // Macros
 use crate::{check_ocr_call, load_symbol, release_ocr_resource};
 
