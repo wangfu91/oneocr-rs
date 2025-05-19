@@ -100,22 +100,24 @@ impl<'a> OcrLine<'a> {
     ///  - Returns a tuple containing:
     ///    - A boolean indicating if the line is handwritten (true) or printed (false).
     ///    - A confidence score (0.0-1.0) indicating the certainty of the classification.
-    ///      - 0.0: Printed text
-    ///      - 1.0: Handwriting
+    ///      - 0.0: Handwritten
+    ///      - 1.0: Printed
     ///  - Returns an error if the OCR API call fails.
     pub fn get_line_style(&self) -> Result<(bool, f32), OneOcrError> {
         load_symbol!(self.lib, get_ocr_line_style_fn, GetOcrLineStyle);
 
-        let mut handwritten: i32 = 0;
-        let mut confidence_score: f32 = 0.0;
+        // style: 0 = Handwritten, 1 = Printed
+        let mut style: i32 = 0;
+        // handwritten_confidence: 0.0 = Handwritten, 1.0 = Printed
+        let mut handwritten_confidence: f32 = 0.0;
 
         check_ocr_call!(
             unsafe {
-                get_ocr_line_style_fn(self.line_handle, &mut handwritten, &mut confidence_score)
+                get_ocr_line_style_fn(self.line_handle, &mut style, &mut handwritten_confidence)
             },
             "Failed to get OCR line style"
         );
 
-        Ok((handwritten == 0, confidence_score))
+        Ok((style == 0, handwritten_confidence))
     }
 }
