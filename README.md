@@ -64,7 +64,7 @@ fn main() -> Result<(), OneOcrError> {
 See the [examples](examples) directory for more detailed usage examples.
 
 ## 🖼️ Showcase
-![Bounding box draw of OCR result](https://raw.githubusercontent.com/wangfu91/oneocr-rs/master/assets/bbox_draw.jpg)
+<img src="https://raw.githubusercontent.com/wangfu91/oneocr-rs/master/assets/bbox_draw.jpg" height="240" alt="Bounding box draw of OCR result" />
 
 ## 🙌 Contributing
 
