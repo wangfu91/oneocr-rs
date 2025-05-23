@@ -1,8 +1,14 @@
 use oneocr_rs::{OcrEngine, OneOcrError};
 use std::path::Path;
 
+// cargo run --example ocr_advance -- "/path/to/input/image.png"
+
 fn main() -> Result<(), OneOcrError> {
-    let image_path = Path::new("./target/4k_screenshot.png");
+    let input_image_path = std::env::args()
+        .nth(1)
+        .expect("Please specify an input image path");
+
+    let image_path = Path::new(&input_image_path);
 
     // Create a new OCR instance
     let ocr_engine = OcrEngine::new()?;
@@ -20,7 +26,7 @@ fn main() -> Result<(), OneOcrError> {
     for line in &ocr_result.lines {
         println!();
         println!("Line: {}", line.text);
-        println!("{:?}", line.bounding_box);
+        println!("{}", line.bounding_box);
 
         let (handwritten, confidence) = line.get_line_style()?;
         println!(
@@ -30,8 +36,8 @@ fn main() -> Result<(), OneOcrError> {
 
         if let Some(words) = &line.words {
             for word in words {
-                print!("Word: [{}, {}]\t", word.text, word.confidence);
-                println!("{:?}", word.bounding_box);
+                print!("Word: [{}, {:.2}]\t", word.text, word.confidence);
+                println!("{}", word.bounding_box);
             }
         }
     }

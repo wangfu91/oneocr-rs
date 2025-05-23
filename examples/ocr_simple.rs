@@ -1,8 +1,14 @@
 use oneocr_rs::{OcrEngine, OneOcrError};
 use std::path::Path;
 
+// cargo run --example ocr_simple -- "/path/to/input/image.png"
+
 fn main() -> Result<(), OneOcrError> {
-    let image_path = Path::new("./target/screenshot.png");
+    let input_image_path = std::env::args()
+        .nth(1)
+        .expect("Please specify an input image path");
+
+    let image_path = Path::new(&input_image_path);
 
     // Create a new OCR instance
     let ocr_engine = OcrEngine::new()?;
@@ -10,9 +16,9 @@ fn main() -> Result<(), OneOcrError> {
     // Perform OCR on an image
     let ocr_result = ocr_engine.run(image_path, false)?;
 
-    // Print the OCR lines and their bounding boxes
+    // Print the OCR lines.
     for line in &ocr_result.lines {
-        println!("{}, {}", line.text, line.bounding_box);
+        println!("{}", line.text);
     }
 
     Ok(())
