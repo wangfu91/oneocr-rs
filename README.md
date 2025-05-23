@@ -34,21 +34,21 @@ oneocr-rs = "0.1.0" # Replace with the latest version
 ## 💡 Usage
 
 ```rust
-use oneocr_rs::errors::OneOcrError;
+use oneocr_rs::{OcrEngine, OneOcrError};
 use std::path::Path;
 
 fn main() -> Result<(), OneOcrError> {
     // Create a new OCR engine instance
-    let ocr_engine = oneocr_rs::OcrEngine::new()?;
+    let ocr_engine = OcrEngine::new()?;
 
-    let image_path = Path::new("./target/screenshot.png"); // Replace with your image path
+    let image_path = Path::new("screenshot.png"); // Replace with your image path
 
     // Perform OCR on an image
     let ocr_result = ocr_engine.run(image_path, false)?;
 
-    // Print the OCR result
+    // Print the OCR lines and their bounding boxes
     for line in &ocr_result.lines {
-        println!("{}", line.text);
+        println!("{}, {}", line.text, line.bounding_box);
     }
 
     Ok(())
