@@ -1,5 +1,4 @@
 use crate::errors::OneOcrError;
-use crate::image::Image;
 use crate::ocr_result::OcrResult;
 use crate::{ONE_OCR_MODEL_FILE_NAME, ONE_OCR_MODEL_KEY};
 use image::DynamicImage;
@@ -12,7 +11,7 @@ use crate::ffi::{
     CreateOcrInitOptions, CreateOcrPipeline, CreateOcrProcessOptions,
     OcrInitOptionsSetUseModelDelayLoad, OcrProcessOptionsGetMaxRecognitionLineCount,
     OcrProcessOptionsGetResizeResolution, OcrProcessOptionsSetMaxRecognitionLineCount,
-    OcrProcessOptionsSetResizeResolution, ReleaseOcrInitOptions, ReleaseOcrPipeline,
+    OcrProcessOptionsSetResizeResolution, RawImage, ReleaseOcrInitOptions, ReleaseOcrPipeline,
     ReleaseOcrProcessOptions, RunOcrPipeline,
 };
 // Macros
@@ -198,7 +197,7 @@ impl OcrEngine {
         let (rows, cols) = (img_rgba.height() as i32, img_rgba.width() as i32);
         let step = (img_rgba.sample_layout().height_stride) as i64;
         let data_ptr = img_rgba.as_ptr() as i64;
-        let image = Image {
+        let image = RawImage {
             t: 3, // Assuming 3 means RGBA or a type the C API expects
             col: cols,
             row: rows,

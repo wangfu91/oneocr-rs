@@ -1,7 +1,6 @@
 mod bounding_box;
 mod errors;
 mod ffi;
-mod image;
 mod ocr_engine;
 mod ocr_line;
 mod ocr_result;

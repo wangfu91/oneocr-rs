@@ -22,10 +22,10 @@ fn main() -> Result<(), OneOcrError> {
         println!("Line: {}", line.text);
         println!("{:?}", line.bounding_box);
 
-        let (handwriting, confidence) = line.get_line_style()?;
+        let (handwritten, confidence) = line.get_line_style()?;
         println!(
-            "Line style: handwrtten: {}, handwritten confidence: {}",
-            handwriting, confidence
+            "Line style: handwritten: {}, handwritten style confidence: {}",
+            handwritten, confidence
         );
 
         if let Some(words) = &line.words {

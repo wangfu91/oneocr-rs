@@ -8,6 +8,7 @@ use std::ffi::{CStr, c_char};
 // FFI types
 use crate::ffi::{
     GetOcrLineBoundingBox, GetOcrLineContent, GetOcrLineStyle, GetOcrLineWordCount, GetOcrWord,
+    RawBBox,
 };
 // Macros
 use crate::{check_ocr_call, load_symbol};
@@ -42,7 +43,7 @@ impl<'a> OcrLine<'a> {
         let line_content_cstr = unsafe { CStr::from_ptr(line_content as *const c_char) };
         let line_content_str = line_content_cstr.to_string_lossy().to_string();
 
-        let mut bounding_box_ptr: *const BoundingBox = std::ptr::null();
+        let mut bounding_box_ptr: *const RawBBox = std::ptr::null();
         check_ocr_call!(
             unsafe { get_ocr_line_bounding_box(line_handle, &mut bounding_box_ptr) },
             "Failed to get line bounding box"
@@ -54,7 +55,9 @@ impl<'a> OcrLine<'a> {
                 message: "GetOcrLineBoundingBox returned a null pointer.".to_string(),
             });
         }
-        let bounding_box = unsafe { std::ptr::read(bounding_box_ptr) };
+
+        let raw_bbox = unsafe { std::ptr::read(bounding_box_ptr) };
+        let bounding_box = BoundingBox::new(raw_bbox);
 
         if !word_level_detail {
             return Ok(Self {

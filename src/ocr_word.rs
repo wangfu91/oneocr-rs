@@ -5,7 +5,7 @@ use serde::Serialize;
 use std::ffi::{CStr, c_char};
 
 // FFI types used by this module
-use crate::ffi::{GetOcrWordBoundingBox, GetOcrWordConfidence, GetOcrWordContent};
+use crate::ffi::{GetOcrWordBoundingBox, GetOcrWordConfidence, GetOcrWordContent, RawBBox};
 // Macros
 use crate::{check_ocr_call, load_symbol};
 
@@ -32,7 +32,7 @@ impl OcrWord {
         let word_content_cstr = unsafe { CStr::from_ptr(word_content as *const c_char) };
         let word_content_str = word_content_cstr.to_string_lossy().to_string();
 
-        let mut bounding_box_ptr: *const BoundingBox = std::ptr::null();
+        let mut bounding_box_ptr: *const RawBBox = std::ptr::null();
         check_ocr_call!(
             unsafe { get_ocr_word_bounding_box(word_handle, &mut bounding_box_ptr) },
             "Failed to get word bounding box"
@@ -44,7 +44,9 @@ impl OcrWord {
                 message: "GetOcrWordBoundingBox returned a null pointer.".to_string(),
             });
         }
-        let bounding_box = unsafe { std::ptr::read(bounding_box_ptr) };
+
+        let raw_bbox = unsafe { std::ptr::read(bounding_box_ptr) };
+        let bounding_box = BoundingBox::new(raw_bbox);
 
         let mut confidence: f32 = 0.0;
         check_ocr_call!(

@@ -1,19 +1,59 @@
 use serde::Serialize;
 
-/// This `BoundingBox` struct represents a quadrilateral (four-sided polygon) in 2D space, typically used for OCR (Optical Character Recognition) to tightly enclose detected text. Each pair of fields represents the X and Y coordinates of a corner of the bounding box.
-///  - x1, y1: Coordinates of the top-left corner.
-///  - x2, y2: Coordinates of the top-right corner.
-///  - x3, y3: Coordinates of the bottom-right corner.
-///  - x4, y4: Coordinates of the bottom-left corner.
-#[repr(C, packed)]
+use crate::ffi::RawBBox;
+
+/// This `Point` struct represents a point in 2D space with X and Y coordinates.
+#[derive(Debug, Clone, Copy, Default, Serialize)]
+pub struct Point {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl std::fmt::Display for Point {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+/// This `BoundingBox` struct represents a bounding box in 2D space, used for OCR to tightly enclose detected text.
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct BoundingBox {
-    pub x1: f32,
-    pub y1: f32,
-    pub x2: f32,
-    pub y2: f32,
-    pub x3: f32,
-    pub y3: f32,
-    pub x4: f32,
-    pub y4: f32,
+    pub top_left: Point,
+    pub top_right: Point,
+    pub bottom_right: Point,
+    pub bottom_left: Point,
+}
+
+impl BoundingBox {
+    /// Creates a new `BoundingBox` from a FFI `RawBBox`.
+    pub(crate) fn new(bbox: RawBBox) -> Self {
+        BoundingBox {
+            top_left: Point {
+                x: bbox.x1,
+                y: bbox.y1,
+            },
+            top_right: Point {
+                x: bbox.x2,
+                y: bbox.y2,
+            },
+            bottom_right: Point {
+                x: bbox.x3,
+                y: bbox.y3,
+            },
+            bottom_left: Point {
+                x: bbox.x4,
+                y: bbox.y4,
+            },
+        }
+    }
+}
+
+impl std::fmt::Display for BoundingBox {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "[ ⌜ {}, ⌝ {}, ⌟ {}, ⌞ {}",
+            self.top_left, self.top_right, self.bottom_right, self.bottom_left,
+        )
+    }
 }
