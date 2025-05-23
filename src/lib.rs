@@ -8,6 +8,7 @@ mod ocr_word;
 
 // Re-export the public structs for easier access
 pub use bounding_box::BoundingBox;
+pub use bounding_box::Point;
 pub use errors::OneOcrError;
 pub use ocr_engine::OcrEngine;
 pub use ocr_line::OcrLine;
