@@ -6,7 +6,7 @@ use std::path::Path;
 fn main() -> Result<(), OneOcrError> {
     let input_image_path = std::env::args()
         .nth(1)
-        .expect("Please specify an input image path");
+        .unwrap_or("./assets/sample.jpg".to_string());
 
     let image_path = Path::new(&input_image_path);
 

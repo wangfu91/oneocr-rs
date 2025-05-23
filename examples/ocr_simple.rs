@@ -4,9 +4,10 @@ use std::path::Path;
 // cargo run --example ocr_simple -- "/path/to/input/image.png"
 
 fn main() -> Result<(), OneOcrError> {
+    // Get the input image path from command line arguments or use a default sample image
     let input_image_path = std::env::args()
         .nth(1)
-        .expect("Please specify an input image path");
+        .unwrap_or("./assets/sample.jpg".to_string());
 
     let image_path = Path::new(&input_image_path);
 

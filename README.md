@@ -23,6 +23,8 @@ This crate allows you to leverage the powerful OCR capabilities of the Windows 1
 -   📄 The `oneocr.dll`, `oneocr.onemodel`, and `onnxruntime.dll` files must be present in the same directory as your executable. These files are part of the Snipping Tool app. You can find its installation location by running the following PowerShell command. After locating the folder, copy these three files into your project's target directory (e.g., `target/debug` or `target/release`) or alongside your final executable.
 ```powershell
 Get-AppxPackage Microsoft.ScreenSketch | Select-Object -ExpandProperty InstallLocation
+# Example output: 
+# C:\Program Files\WindowsApps\Microsoft.ScreenSketch_11.2504.38.0_x64__8wekyb3d8bbwe
 ```
 
 ## 🚀 Installation
@@ -60,6 +62,9 @@ fn main() -> Result<(), OneOcrError> {
 ```
 
 See the [examples](examples) directory for more detailed usage examples.
+
+## 🖼️ Showcase
+![Bounding box draw of OCR result](./assets/bbox_draw.jpg)
 
 ## 🙌 Contributing
 
