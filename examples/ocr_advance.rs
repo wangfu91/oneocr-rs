@@ -21,7 +21,7 @@ fn main() -> Result<(), OneOcrError> {
     let ocr_result = ocr_engine.run(image_path, include_word_level_detail)?;
 
     // Print the OCR result
-    println!("Image angle: {}", ocr_result.image_angle);
+    println!("Image angle: {:.2}", ocr_result.image_angle);
 
     for line in &ocr_result.lines {
         println!();
