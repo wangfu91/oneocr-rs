@@ -1,6 +1,6 @@
 [package]
 name = "oneocr-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["Fu Wang <wangfu91@hotmail.com>"]
 description = "A Rust binding for OneOCR, an embedded OCR engine in Windows 11 Snipping Tool."
