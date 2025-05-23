@@ -2,22 +2,25 @@
 name = "oneocr-rs"
 version = "0.1.0"
 edition = "2024"
+authors = ["Fu Wang <wangfu91@hotmail.com>"]
 description = "A Rust binding for OneOCR, an embedded OCR engine in Windows 11 Snipping Tool."
 license = "MIT"
 repository = "https://github.com/wangfu91/oneocr-rs"
 keywords = ["ocr", "windows", "oneocr"]
 categories = ["api-bindings", "os::windows-apis"]
+readme = "README.md"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-pc-windows-msvc", "aarch64-pc-windows-msvc", "i686-pc-windows-msvc"]
 
 [dependencies]
-image = "0.25.6"
+image = "0.25"
 libloading = "0.8.7"
 thiserror = "2.0.12"
 serde = { version = "1.0.219", features = ["derive"] }
 
 [dev-dependencies]
+imageproc = "0.25"
 criterion = "0.6.0"
 
 [[bench]]
