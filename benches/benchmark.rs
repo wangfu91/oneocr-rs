@@ -19,7 +19,7 @@ pub fn ocr_simple() -> Result<(), OneOcrError> {
     let ocr_engine = oneocr_rs::OcrEngine::new()?;
 
     // Perform OCR on an image
-    let image_path = Path::new("./target/screenshot.png");
+    let image_path = Path::new("./assets/sample.jpg");
     let _ocr_result = ocr_engine.run(image_path, false)?;
 
     Ok(())
@@ -31,7 +31,7 @@ pub fn ocr_advance() -> Result<(), OneOcrError> {
     let ocr_engine = oneocr_rs::OcrEngine::new()?;
 
     // Perform OCR on an image
-    let image_path = Path::new("./target/screenshot.png");
+    let image_path = Path::new("./assets/sample.jpg");
     let _ocr_result = ocr_engine.run(image_path, true)?;
 
     Ok(())
