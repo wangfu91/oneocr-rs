@@ -34,9 +34,6 @@ impl OcrEngine {
             "Failed to create init options"
         );
 
-        // The FFI function OcrInitOptionsSetUseModelDelayLoad expects a c_char (i8).
-        // In C, char can be signed or unsigned by default depending on the compiler/platform.
-        // Rust's c_char is i8. Assuming 0 is a valid value for false.
         check_ocr_call!(
             unsafe { OcrInitOptionsSetUseModelDelayLoad(init_options) },
             "Failed to set model delay load"
