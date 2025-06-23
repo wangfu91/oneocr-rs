@@ -1,7 +1,7 @@
 use crate::errors::OneOcrError;
 use crate::ocr_line::OcrLine;
 use serde::Serialize;
-use std::os::raw::c_void;
+use std::ffi::c_void;
 use std::ptr;
 
 // FFI types
