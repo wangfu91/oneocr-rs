@@ -13,7 +13,7 @@ pub enum OneOcrError {
     #[error("Invalid model decryption key: {0}")]
     InvalidModelKey(String),
 
-    #[error("Failed to run ocr API {result}, result: {message}")]
+    #[error("Failed to run OCR API (code: {result}): {message}")]
     OcrApiError { result: i32, message: String },
 
     #[error("Other error: {0}")]
