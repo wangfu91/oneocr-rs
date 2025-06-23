@@ -1,12 +1,4 @@
 use crate::errors::OneOcrError;
-use crate::ocr_result::OcrResult;
-use crate::{ONE_OCR_MODEL_FILE_NAME, ONE_OCR_MODEL_KEY};
-use image::DynamicImage;
-use libloading::Library;
-use std::ffi::{CString, c_char};
-use std::path::Path;
-
-// FFI types
 use crate::ffi::{
     CreateOcrInitOptions, CreateOcrPipeline, CreateOcrProcessOptions,
     OcrInitOptionsSetUseModelDelayLoad, OcrProcessOptionsGetMaxRecognitionLineCount,
@@ -14,36 +6,31 @@ use crate::ffi::{
     OcrProcessOptionsSetResizeResolution, RawImage, ReleaseOcrInitOptions, ReleaseOcrPipeline,
     ReleaseOcrProcessOptions, RunOcrPipeline,
 };
+use crate::ocr_result::OcrResult;
+use crate::{ONE_OCR_MODEL_FILE_NAME, ONE_OCR_MODEL_KEY};
+use image::DynamicImage;
+use std::ffi::{CString, c_void};
+use std::path::Path;
+use std::ptr;
+
 // Macros
-use crate::{check_ocr_call, load_symbol, release_ocr_resource};
+use crate::check_ocr_call;
 
 /// The `OcrEngine` struct represents the OneOcr processing engine.
 #[derive(Debug)]
 pub struct OcrEngine {
-    lib: Library,
-    init_options: i64,
-    pipeline: i64,
-    process_options: i64,
+    init_options: *mut c_void,
+    pipeline: *mut c_void,
+    process_options: *mut c_void,
 }
 
 impl OcrEngine {
     /// Creates a new instance of the OCR engine.
     /// This function loads the necessary library and initializes the OCR pipeline.
     pub fn new() -> Result<Self, OneOcrError> {
-        let lib = unsafe { Library::new("oneocr.dll")? };
-
-        load_symbol!(lib, create_ocr_init_options, CreateOcrInitOptions);
-        load_symbol!(
-            lib,
-            ocr_init_options_set_use_model_delay_load,
-            OcrInitOptionsSetUseModelDelayLoad
-        );
-        load_symbol!(lib, create_ocr_pipeline, CreateOcrPipeline);
-        load_symbol!(lib, create_ocr_process_options, CreateOcrProcessOptions);
-
-        let mut init_options: i64 = 0;
+        let mut init_options: *mut c_void = ptr::null_mut();
         check_ocr_call!(
-            unsafe { create_ocr_init_options(&mut init_options) },
+            unsafe { CreateOcrInitOptions(&mut init_options) },
             "Failed to create init options"
         );
 
@@ -51,7 +38,7 @@ impl OcrEngine {
         // In C, char can be signed or unsigned by default depending on the compiler/platform.
         // Rust's c_char is i8. Assuming 0 is a valid value for false.
         check_ocr_call!(
-            unsafe { ocr_init_options_set_use_model_delay_load(init_options, 0 as c_char) },
+            unsafe { OcrInitOptionsSetUseModelDelayLoad(init_options) },
             "Failed to set model delay load"
         );
 
@@ -67,10 +54,10 @@ impl OcrEngine {
             OneOcrError::InvalidModelKey(format!("Failed to convert model key to CString: {}", e))
         })?;
 
-        let mut pipeline: i64 = 0;
+        let mut pipeline: *mut c_void = ptr::null_mut();
         check_ocr_call!(
             unsafe {
-                create_ocr_pipeline(
+                CreateOcrPipeline(
                     model_path_cstr.as_ptr(),
                     key_cstr.as_ptr(),
                     init_options,
@@ -80,14 +67,13 @@ impl OcrEngine {
             "Failed to create OCR pipeline"
         );
 
-        let mut process_options: i64 = 0;
+        let mut process_options: *mut c_void = ptr::null_mut();
         check_ocr_call!(
-            unsafe { create_ocr_process_options(&mut process_options) },
+            unsafe { CreateOcrProcessOptions(&mut process_options) },
             "Failed to create OCR process options"
         );
 
         Ok(Self {
-            lib,
             init_options,
             pipeline,
             process_options,
@@ -96,16 +82,11 @@ impl OcrEngine {
 
     /// Retrieves the maximum number of lines that can be recognized.
     /// Default is 100.
-    pub fn get_max_recognition_line_count(&self) -> Result<i64, OneOcrError> {
-        load_symbol!(
-            self.lib,
-            ocr_process_options_get_max_recognition_line_count,
-            OcrProcessOptionsGetMaxRecognitionLineCount
-        );
-        let mut count: i64 = 0;
+    pub fn get_max_recognition_line_count(&self) -> Result<i32, OneOcrError> {
+        let mut count: i32 = 0;
         check_ocr_call!(
             unsafe {
-                ocr_process_options_get_max_recognition_line_count(self.process_options, &mut count)
+                OcrProcessOptionsGetMaxRecognitionLineCount(self.process_options, &mut count)
             },
             "Failed to get max recognition line count"
         );
@@ -114,16 +95,9 @@ impl OcrEngine {
 
     /// Sets the maximum number of lines that can be recognized.
     /// Default is 100, range is 0-1000.
-    pub fn set_max_recognition_line_count(&self, count: i64) -> Result<(), OneOcrError> {
-        load_symbol!(
-            self.lib,
-            ocr_process_options_set_max_recognition_line_count,
-            OcrProcessOptionsSetMaxRecognitionLineCount
-        );
+    pub fn set_max_recognition_line_count(&self, count: i32) -> Result<(), OneOcrError> {
         check_ocr_call!(
-            unsafe {
-                ocr_process_options_set_max_recognition_line_count(self.process_options, count)
-            },
+            unsafe { OcrProcessOptionsSetMaxRecognitionLineCount(self.process_options, count) },
             "Failed to set max recognition line count"
         );
         Ok(())
@@ -136,20 +110,11 @@ impl OcrEngine {
     ///
     /// Default is 1152*768.
     pub fn get_resize_resolution(&self) -> Result<(i64, i64), OneOcrError> {
-        load_symbol!(
-            self.lib,
-            ocr_process_options_get_resize_resolution,
-            OcrProcessOptionsGetResizeResolution
-        );
         let mut width: i64 = 0;
         let mut height: i64 = 0;
         check_ocr_call!(
             unsafe {
-                ocr_process_options_get_resize_resolution(
-                    self.process_options,
-                    &mut width,
-                    &mut height,
-                )
+                OcrProcessOptionsGetResizeResolution(self.process_options, &mut width, &mut height)
             },
             "Failed to get resize resolution"
         );
@@ -162,16 +127,9 @@ impl OcrEngine {
     /// It’s a performance and accuracy trade-off rather than a restriction on the original image’s resolution.
     ///
     /// The maximum resolution is 1152*768.
-    pub fn set_resize_resolution(&self, width: i64, height: i64) -> Result<(), OneOcrError> {
-        load_symbol!(
-            self.lib,
-            ocr_process_options_set_resize_resolution,
-            OcrProcessOptionsSetResizeResolution
-        );
+    pub fn set_resize_resolution(&self, width: i32, height: i32) -> Result<(), OneOcrError> {
         check_ocr_call!(
-            unsafe {
-                ocr_process_options_set_resize_resolution(self.process_options, width, height)
-            },
+            unsafe { OcrProcessOptionsSetResizeResolution(self.process_options, width, height) },
             "Failed to set resize resolution"
         );
         Ok(())
@@ -206,22 +164,13 @@ impl OcrEngine {
             data_ptr,
         };
 
-        load_symbol!(self.lib, run_ocr_pipeline, RunOcrPipeline);
-
-        let mut ocr_result_handle: i64 = 0;
+        let mut ocr_result: *mut c_void = ptr::null_mut();
         check_ocr_call!(
-            unsafe {
-                run_ocr_pipeline(
-                    self.pipeline,
-                    &image,
-                    self.process_options,
-                    &mut ocr_result_handle,
-                )
-            },
+            unsafe { RunOcrPipeline(self.pipeline, &image, self.process_options, &mut ocr_result) },
             "Failed to run OCR pipeline"
         );
 
-        OcrResult::new(&self.lib, ocr_result_handle, word_level_detail)
+        OcrResult::new(ocr_result, word_level_detail)
     }
 
     /// Retrieves the path to the model file.
@@ -245,8 +194,10 @@ impl OcrEngine {
 
 impl Drop for OcrEngine {
     fn drop(&mut self) {
-        release_ocr_resource!(self.lib, ReleaseOcrPipeline, self.pipeline);
-        release_ocr_resource!(self.lib, ReleaseOcrInitOptions, self.init_options);
-        release_ocr_resource!(self.lib, ReleaseOcrProcessOptions, self.process_options);
+        unsafe {
+            ReleaseOcrPipeline(self.pipeline);
+            ReleaseOcrInitOptions(self.init_options);
+            ReleaseOcrProcessOptions(self.process_options);
+        };
     }
 }

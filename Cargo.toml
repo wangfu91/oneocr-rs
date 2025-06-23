@@ -15,9 +15,9 @@ targets = ["x86_64-pc-windows-msvc", "aarch64-pc-windows-msvc", "i686-pc-windows
 
 [dependencies]
 image = "0.25"
-libloading = "0.8.7"
 thiserror = "2.0.12"
 serde = { version = "1.0.219", features = ["derive"] }
+windows-link = "0.1.3"
 
 [dev-dependencies]
 imageproc = "0.25"

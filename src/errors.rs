@@ -7,9 +7,6 @@ pub enum OneOcrError {
     #[error("Image format not supported: {0}")]
     ImageFormatError(String),
 
-    #[error("Failed to load library: {0}")]
-    LibraryLoadError(#[from] libloading::Error),
-
     #[error("Failed to load model file: {0}")]
     ModelFileLoadError(String),
 
@@ -17,7 +14,7 @@ pub enum OneOcrError {
     InvalidModelKey(String),
 
     #[error("Failed to run ocr API {result}, result: {message}")]
-    OcrApiError { result: i64, message: String },
+    OcrApiError { result: i32, message: String },
 
     #[error("Other error: {0}")]
     Other(String),
