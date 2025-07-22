@@ -41,14 +41,11 @@ impl OcrEngine {
 
         let model_path = Self::get_model_path()?;
         let model_path_cstr = CString::new(model_path).map_err(|e| {
-            OneOcrError::ModelFileLoadError(format!(
-                "Failed to convert model path to CString: {}",
-                e
-            ))
+            OneOcrError::ModelFileLoadError(format!("Failed to convert model path to CString: {e}"))
         })?;
 
         let key_cstr = CString::new(ONE_OCR_MODEL_KEY).map_err(|e| {
-            OneOcrError::InvalidModelKey(format!("Failed to convert model key to CString: {}", e))
+            OneOcrError::InvalidModelKey(format!("Failed to convert model key to CString: {e}"))
         })?;
 
         let mut pipeline: *mut c_void = ptr::null_mut();
@@ -144,8 +141,7 @@ impl OcrEngine {
             DynamicImage::ImageRgb8(i) => DynamicImage::ImageRgb8(i).to_rgba8(),
             _ => {
                 return Err(OneOcrError::ImageFormatError(format!(
-                    "Unsupported image format: {:?}",
-                    img
+                    "Unsupported image format: {img:?}"
                 )));
             }
         };
@@ -173,7 +169,7 @@ impl OcrEngine {
     /// Retrieves the path to the model file.
     fn get_model_path() -> Result<String, OneOcrError> {
         let exe_path = std::env::current_exe().map_err(|e| {
-            OneOcrError::ModelFileLoadError(format!("Failed to get current executable path: {}", e))
+            OneOcrError::ModelFileLoadError(format!("Failed to get current executable path: {e}"))
         })?;
         let model_path_buf = exe_path
             .parent()
