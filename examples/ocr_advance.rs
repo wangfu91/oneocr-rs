@@ -30,8 +30,7 @@ fn main() -> Result<(), OneOcrError> {
 
         let (handwritten, confidence) = line.get_line_style()?;
         println!(
-            "Line style: handwritten: {}, handwritten style confidence: {}",
-            handwritten, confidence
+            "Line style: handwritten: {handwritten}, handwritten style confidence: {confidence}"
         );
 
         if let Some(words) = &line.words {
