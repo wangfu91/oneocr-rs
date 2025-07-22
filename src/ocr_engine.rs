@@ -175,17 +175,18 @@ impl OcrEngine {
     /// # Examples
     ///
     /// ```no_run
-    /// # use oneocr_rs::{OcrEngine, OcrOptions, ImageInput};
-    /// # use std::path::Path;
-    /// let engine = OcrEngine::new()?;
+    /// use oneocr_rs::{OcrEngine, OcrOptions, ImageInput};
+    /// use std::path::Path;
+    /// let engine = OcrEngine::new().unwrap();
     ///
     /// // Process from file path
-    /// let result = engine.run(Path::new("image.jpg").into())?;
+    /// let result = engine.run(Path::new("image.jpg").into()).unwrap();
+    /// ```
     ///
+    /// ```ignore
     /// // Process from in-memory image buffer
     /// let img_buffer: ImageBuffer<Rgba<u8>, Vec<u8>> = capture_screenshot(); // Your screenshot function
-    /// let result = engine.run(img_buffer.into())?;
-    /// # Ok::<(), oneocr_rs::OneOcrError>(())
+    /// let result = engine.run(img_buffer.into()).unwrap();
     /// ```
     pub fn run(&self, input: ImageInput) -> Result<OcrResult, OneOcrError> {
         let img_rgba = self.load_image(input)?;
@@ -197,17 +198,17 @@ impl OcrEngine {
         match input {
             ImageInput::FilePath(path) => {
                 let img = image::open(path)?;
-                Ok(self.convert_to_rgba(&img))
+                Ok(self.convert_to_rgba(img))
             }
-            ImageInput::Buffer(buffer) => Ok(buffer.clone()),
+            ImageInput::Buffer(buffer) => Ok(buffer),
             ImageInput::Dynamic(img) => Ok(self.convert_to_rgba(img)),
         }
     }
 
     /// Converts a DynamicImage to RGBA format.
-    fn convert_to_rgba(&self, img: &DynamicImage) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
+    fn convert_to_rgba(&self, img: DynamicImage) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
         match img {
-            DynamicImage::ImageRgba8(i) => i.clone(),
+            DynamicImage::ImageRgba8(i) => i,
             _ => img.to_rgba8(),
         }
     }
