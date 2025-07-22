@@ -15,7 +15,7 @@ fn main() -> Result<(), OneOcrError> {
     let ocr_engine = OcrEngine::new()?;
 
     // Perform OCR on an image
-    let ocr_result = ocr_engine.run(image_path, false)?;
+    let ocr_result = ocr_engine.run(image_path.into())?;
 
     // Print the OCR lines.
     for line in &ocr_result.lines {

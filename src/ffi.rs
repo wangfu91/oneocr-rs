@@ -2,7 +2,7 @@ use std::ffi::{c_char, c_void};
 use windows_link::link;
 
 link!("oneocr.dll"  "system"  fn CreateOcrInitOptions(init_option: *mut *mut c_void) -> i32);
-link!("oneocr.dll"  "system"  fn OcrInitOptionsSetUseModelDelayLoad(init_option: *mut c_void) -> i32);
+link!("oneocr.dll"  "system"  fn OcrInitOptionsSetUseModelDelayLoad(init_option: *mut c_void, delay_load: u8) -> i32);
 link!("oneocr.dll"  "system"  fn CreateOcrPipeline(
     model_path: *const c_char,
     key: *const c_char,
