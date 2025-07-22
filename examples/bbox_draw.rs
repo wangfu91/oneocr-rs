@@ -1,6 +1,6 @@
 use image::Rgba;
 use imageproc::drawing::draw_line_segment_mut;
-use oneocr_rs::{OcrEngine, OneOcrError};
+use oneocr_rs::{OcrEngine, OcrOptions, OneOcrError};
 use std::path::Path;
 
 // cargo run --example bbox_draw -- "/path/to/input/image.jpg" "/path/to/draw_output.jpg"
@@ -18,14 +18,17 @@ fn main() -> Result<(), OneOcrError> {
     let output_image_path = Path::new(&output_image_path);
 
     // Create a new OCR instance
-    let ocr_engine = OcrEngine::new()?;
+    let options = OcrOptions {
+        include_word_level_details: true,
+        ..Default::default()
+    };
+    let ocr_engine = OcrEngine::new_with_options(options)?;
 
     // Set to the max recognition line count possible.
     ocr_engine.set_max_recognition_line_count(1000)?;
 
     // Perform OCR on an image
-    let include_word_level_detail = true;
-    let ocr_result = ocr_engine.run(input_image_path, include_word_level_detail)?;
+    let ocr_result = ocr_engine.run(input_image_path.into())?;
 
     // Load the image
     let mut img = image::open(input_image_path)?;

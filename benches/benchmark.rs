@@ -1,7 +1,7 @@
 use std::{path::Path, time::Duration};
 
 use criterion::{Criterion, criterion_group, criterion_main};
-use oneocr_rs::OneOcrError;
+use oneocr_rs::{ImageInput, OcrOptions, OneOcrError};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("ocr_bench_group");
@@ -20,7 +20,7 @@ pub fn ocr_simple() -> Result<(), OneOcrError> {
 
     // Perform OCR on an image
     let image_path = Path::new("./assets/sample.jpg");
-    let _ocr_result = ocr_engine.run(image_path, false)?;
+    let _ocr_result = ocr_engine.run(ImageInput::FilePath(image_path))?;
 
     Ok(())
 }
@@ -28,11 +28,15 @@ pub fn ocr_simple() -> Result<(), OneOcrError> {
 #[inline]
 pub fn ocr_advance() -> Result<(), OneOcrError> {
     // Create a new OCR instance
-    let ocr_engine = oneocr_rs::OcrEngine::new()?;
+    let ocr_options = OcrOptions {
+        include_word_level_details: true,
+        ..Default::default()
+    };
+    let ocr_engine = oneocr_rs::OcrEngine::new_with_options(ocr_options)?;
 
     // Perform OCR on an image
     let image_path = Path::new("./assets/sample.jpg");
-    let _ocr_result = ocr_engine.run(image_path, true)?;
+    let _ocr_result = ocr_engine.run(ImageInput::FilePath(image_path))?;
 
     Ok(())
 }

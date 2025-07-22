@@ -1,8 +1,10 @@
 mod bounding_box;
 mod errors;
 mod ffi;
+mod image_input;
 mod ocr_engine;
 mod ocr_line;
+mod ocr_options;
 mod ocr_result;
 mod ocr_word;
 
@@ -10,8 +12,10 @@ mod ocr_word;
 pub use bounding_box::BoundingBox;
 pub use bounding_box::Point;
 pub use errors::OneOcrError;
+pub use image_input::ImageInput;
 pub use ocr_engine::OcrEngine;
 pub use ocr_line::OcrLine;
+pub use ocr_options::{OcrOptions, Resolution};
 pub use ocr_result::OcrResult;
 pub use ocr_word::OcrWord;
 

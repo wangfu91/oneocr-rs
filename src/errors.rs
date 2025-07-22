@@ -1,4 +1,4 @@
-// Define a custom error type named OneOcrError using thiserror crate for better error handling
+/// Custom error type for OneOcr operations.
 #[derive(Debug, thiserror::Error)]
 pub enum OneOcrError {
     #[error("Failed to open image: {0}")]
