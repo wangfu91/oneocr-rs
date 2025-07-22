@@ -23,9 +23,9 @@ This crate allows you to leverage the powerful OCR capabilities of the Windows 1
 -   📄 The `oneocr.dll`, `oneocr.onemodel`, and `onnxruntime.dll` files must be present in the same directory as your executable. These files are part of the Snipping Tool app. You can find its installation location by running the following PowerShell command. After locating the folder, copy these three files into your project's target directory (e.g., `target/debug` or `target/release`) or alongside your final executable.
 ```powershell
 Get-AppxPackage Microsoft.ScreenSketch | Select-Object -ExpandProperty InstallLocation
-# Example output: 
-# C:\Program Files\WindowsApps\Microsoft.ScreenSketch_11.2504.38.0_x64__8wekyb3d8bbwe
 ```
+Example output: 
+`C:\Program Files\WindowsApps\Microsoft.ScreenSketch_11.2504.38.0_x64__8wekyb3d8bbwe`
 
 ## 🚀 Installation
 
@@ -46,11 +46,11 @@ fn main() -> Result<(), OneOcrError> {
     // Create a new OCR engine instance
     let ocr_engine = OcrEngine::new()?;
 
-    // Replace with your image path
-    let image_path = Path::new("screenshot.png"); 
+    // Set the path of the image
+    let image_path = Path::new("screenshot.png");
 
-    // Perform OCR on an image
-    let ocr_result = ocr_engine.run(image_path, false)?;
+    // Perform OCR on the image
+    let ocr_result = ocr_engine.run(image_path.into())?;
 
     // Print the OCR lines and their bounding boxes
     for line in &ocr_result.lines {
@@ -64,6 +64,8 @@ fn main() -> Result<(), OneOcrError> {
 See the [examples](examples) directory for more detailed usage examples.
 
 ## 🖼️ Showcase
+Drawing bounding boxes around the detected lines and words in an image.
+
 <img src="https://raw.githubusercontent.com/wangfu91/oneocr-rs/master/assets/bbox_draw.jpg" height="240" alt="Bounding box draw of OCR result" />
 
 ## 🙌 Contributing
