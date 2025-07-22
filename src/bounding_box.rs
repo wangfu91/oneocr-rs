@@ -52,7 +52,7 @@ impl std::fmt::Display for BoundingBox {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "[ ⌜ {}, ⌝ {}, ⌟ {}, ⌞ {}",
+            "[ ⌜ {}, ⌝ {}, ⌟ {}, ⌞ {}]",
             self.top_left, self.top_right, self.bottom_right, self.bottom_left,
         )
     }
