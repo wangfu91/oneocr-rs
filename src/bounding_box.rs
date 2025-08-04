@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::ffi::RawBBox;
 
 /// This `Point` struct represents a point in 2D space with X and Y coordinates.
-#[derive(Debug, Clone, Copy, Default, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
 pub struct Point {
     pub x: f32,
     pub y: f32,
@@ -16,7 +16,7 @@ impl std::fmt::Display for Point {
 }
 
 /// This `BoundingBox` struct represents a bounding box in 2D space, used for OCR to tightly enclose detected text.
-#[derive(Debug, Clone, Copy, Default, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
 pub struct BoundingBox {
     pub top_left: Point,
     pub top_right: Point,

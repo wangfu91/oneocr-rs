@@ -11,7 +11,7 @@ use crate::check_ocr_call;
 
 /// The `OcrWord` struct represents a word recognized by the OCR engine.
 /// It contains the recognized word, its confidence score, and its bounding box.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct OcrWord {
     pub text: String,
     pub confidence: f32,
