@@ -1,12 +1,12 @@
 /// A simple width×height pair.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Resolution {
     pub width: i32,
     pub height: i32,
 }
 
 /// Configuration for OCR processing behavior.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct OcrOptions {
     /// The maximum number of lines that can be recognized.
     /// Default is 100, range is 0-1000.
