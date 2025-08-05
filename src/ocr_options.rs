@@ -6,7 +6,7 @@ pub struct Resolution {
 }
 
 /// Configuration for OCR processing behavior.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OcrOptions {
     /// The maximum number of lines that can be recognized.
     /// Default is 100, range is 0-1000.
