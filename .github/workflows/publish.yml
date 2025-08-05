@@ -2,8 +2,6 @@ name: Publish to crates.io
 
 on:
   push:
-    branches:
-      - master
     tags:
       - 'v*'  # Trigger on tags matching v*, like v1.0.0
 
