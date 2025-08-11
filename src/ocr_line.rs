@@ -109,3 +109,11 @@ impl OcrLine {
         Ok((style == 0, handwritten_confidence))
     }
 }
+
+impl PartialEq for OcrLine {
+    fn eq(&self, other: &Self) -> bool {
+        self.text == other.text
+            && self.bounding_box == other.bounding_box
+            && self.words == other.words
+    }
+}
