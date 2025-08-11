@@ -33,7 +33,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-oneocr-rs = "0.1.0" # Replace with the latest version
+oneocr-rs = "0.3.1" # Replace with the latest version
 ```
 
 ## 💡 Usage
