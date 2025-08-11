@@ -1,7 +1,9 @@
 # oneocr-rs
 
 [![Crates.io](https://img.shields.io/crates/v/oneocr-rs.svg)](https://crates.io/crates/oneocr-rs)
+[![Downloads](https://img.shields.io/crates/d/oneocr-rs.svg)](https://crates.io/crates/oneocr-rs)
 [![Docs.rs](https://docs.rs/oneocr-rs/badge.svg)](https://docs.rs/oneocr-rs)
+[![Build Status](https://github.com/wangfu91/oneocr-rs/workflows/Rust/badge.svg)](https://github.com/wangfu91/oneocr-rs/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Rust binding for OneOCR, the OCR engine embedded in the Windows 11 Snipping Tool app ✂️.
@@ -67,6 +69,10 @@ See the [examples](examples) directory for more detailed usage examples.
 Drawing bounding boxes around the detected lines and words in an image.
 
 <img src="https://raw.githubusercontent.com/wangfu91/oneocr-rs/master/assets/bbox_draw.jpg" height="240" alt="Bounding box draw of OCR result" />
+
+## 📝 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes and releases.
 
 ## 🙌 Contributing
 
