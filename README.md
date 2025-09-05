@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/oneocr-rs.svg)](https://crates.io/crates/oneocr-rs)
 [![Downloads](https://img.shields.io/crates/d/oneocr-rs.svg)](https://crates.io/crates/oneocr-rs)
 [![Docs.rs](https://docs.rs/oneocr-rs/badge.svg)](https://docs.rs/oneocr-rs)
-[![Build Status](https://github.com/wangfu91/oneocr-rs/workflows/Rust/badge.svg)](https://github.com/wangfu91/oneocr-rs/actions)
+[![Build Status](https://github.com/wangfu91/oneocr-rs/workflows/Build/badge.svg)](https://github.com/wangfu91/oneocr-rs/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Rust binding for OneOCR, the OCR engine embedded in the Windows 11 Snipping Tool app ✂️.
