@@ -5,6 +5,15 @@ pub struct Resolution {
     pub height: i32,
 }
 
+impl Default for Resolution {
+    fn default() -> Self {
+        Resolution {
+            width: 1152,
+            height: 768,
+        }
+    }
+}
+
 /// Configuration for OCR processing behavior.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OcrOptions {
@@ -30,10 +39,7 @@ impl Default for OcrOptions {
     fn default() -> Self {
         OcrOptions {
             max_recognition_line_count: 100,
-            resize_resolution: Resolution {
-                width: 1152,
-                height: 768,
-            },
+            resize_resolution: Resolution::default(),
             include_word_level_details: false,
         }
     }
