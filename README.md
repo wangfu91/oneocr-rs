@@ -12,7 +12,7 @@ This crate allows you to leverage the powerful OCR capabilities of the Windows 1
 
 ## ✨ Features
 
--   🖼️ Perform OCR on images.
+-   🖼️ Perform OCR on images offline.
 -   📏 Get bounding boxes for lines and words.
 -   💯 Get confidence scores for words.
 -   📐 Get image angle.
